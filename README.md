@@ -3,9 +3,9 @@
 A Book Management App built with Kotlin Multiplatform (KMP) and Compose Multiplatform as part of a
 Mobile Development Internship Assignment.
 
-## Screenshots
+## Screenshots/ APK
 
-> Screen recording available in the submission.
+> APK available in the submission.
 
 ## Tech Stack
 
