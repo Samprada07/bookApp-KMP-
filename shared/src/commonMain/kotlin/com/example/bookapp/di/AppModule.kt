@@ -9,6 +9,10 @@ import com.example.bookapp.domain.usecase.AddBookUseCase
 import com.example.bookapp.domain.usecase.DeleteBookUseCase
 import com.example.bookapp.domain.usecase.GetBookByIdUseCase
 import com.example.bookapp.domain.usecase.GetBooksUseCase
+import com.example.bookapp.presentation.viewmodel.AddBookViewModel
+import com.example.bookapp.presentation.viewmodel.BookDetailViewModel
+import com.example.bookapp.presentation.viewmodel.BookListViewModel
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 val appModule = module {
@@ -20,4 +24,7 @@ val appModule = module {
     factory { GetBookByIdUseCase(get()) }
     factory { AddBookUseCase(get()) }
     factory { DeleteBookUseCase(get()) }
+    viewModelOf(::BookListViewModel)
+    viewModelOf(::AddBookViewModel)
+    viewModelOf(::BookDetailViewModel)
 }
