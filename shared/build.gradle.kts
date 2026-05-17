@@ -54,6 +54,9 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.koin.compose.viewmodel)
+            implementation(libs.navigation.compose)
+            implementation(compose.material3)
+            implementation(compose.materialIconsExtended)
 
             // Ktor
             implementation(libs.ktor.client.core)
