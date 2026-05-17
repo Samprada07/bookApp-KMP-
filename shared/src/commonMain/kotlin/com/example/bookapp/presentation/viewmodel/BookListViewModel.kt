@@ -11,6 +11,8 @@ import kotlinx.coroutines.launch
 
 data class BookListState(
     val books: List<Book> = emptyList(),
+    val filteredBooks: List<Book> = emptyList(),
+    val searchQuery: String = "",
     val isLoading: Boolean = false,
     val error: String? = null
 )
@@ -32,7 +34,11 @@ class BookListViewModel(
             _state.value = _state.value.copy(isLoading = true, error = null)
             getBooksUseCase().fold(
                 onSuccess = { books ->
-                    _state.value = _state.value.copy(books = books, isLoading = false)
+                    _state.value = _state.value.copy(
+                        books = books,
+                        filteredBooks = books,
+                        isLoading = false
+                    )
                 },
                 onFailure = { error ->
                     _state.value = _state.value.copy(error = error.message, isLoading = false)
@@ -41,12 +47,26 @@ class BookListViewModel(
         }
     }
 
+    fun search(query: String) {
+        _state.value = _state.value.copy(
+            searchQuery = query,
+            filteredBooks = if (query.isEmpty()) _state.value.books
+            else _state.value.books.filter {
+                it.title.contains(query, ignoreCase = true)
+            }
+        )
+    }
+
     fun deleteBook(id: Int) {
         viewModelScope.launch {
             deleteBookUseCase(id).fold(
                 onSuccess = {
+                    val updatedBooks = _state.value.books.filter { it.id != id }
                     _state.value = _state.value.copy(
-                        books = _state.value.books.filter { it.id != id }
+                        books = updatedBooks,
+                        filteredBooks = updatedBooks.filter {
+                            it.title.contains(_state.value.searchQuery, ignoreCase = true)
+                        }
                     )
                 },
                 onFailure = { error ->

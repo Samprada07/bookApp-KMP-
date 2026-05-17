@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,26 +35,41 @@ fun BookListScreen(
             }
         }
     ) { padding ->
-        Box(modifier = Modifier.padding(padding).fillMaxSize()) {
-            when {
-                state.isLoading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                state.error != null -> Text(
-                    text = state.error ?: "Unknown error",
-                    modifier = Modifier.align(Alignment.Center)
+        PullToRefreshBox(
+            isRefreshing = state.isLoading,
+            onRefresh = { viewModel.getBooks() },
+            modifier = Modifier.padding(padding).fillMaxSize()
+        ) {
+            Column(Modifier.fillMaxSize()) {
+                OutlinedTextField(
+                    value = state.searchQuery,
+                    onValueChange = { viewModel.search(it) },
+                    label = { Text("Search books...") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
                 )
-                else -> LazyColumn {
-                    items(state.books) { book ->
-                        ListItem(
-                            headlineContent = { Text(book.title) },
-                            supportingContent = { Text("Pages: ${book.pageCount}") },
-                            trailingContent = {
-                                IconButton(onClick = { viewModel.deleteBook(book.id) }) {
-                                    Icon(Icons.Default.Delete, contentDescription = "Delete")
-                                }
-                            },
-                            modifier = Modifier.clickable { onBookClick(book.id) }
+                when {
+                    state.error != null -> Box(Modifier.fillMaxSize()) {
+                        Text(
+                            text = state.error ?: "Unknown error",
+                            modifier = Modifier.align(Alignment.Center)
                         )
-                        HorizontalDivider()
+                    }
+                    else -> LazyColumn(Modifier.fillMaxSize()) {
+                        items(state.filteredBooks) { book ->
+                            ListItem(
+                                headlineContent = { Text(book.title) },
+                                supportingContent = { Text("Pages: ${book.pageCount}") },
+                                trailingContent = {
+                                    IconButton(onClick = { viewModel.deleteBook(book.id) }) {
+                                        Icon(Icons.Default.Delete, contentDescription = "Delete")
+                                    }
+                                },
+                                modifier = Modifier.clickable { onBookClick(book.id) }
+                            )
+                            HorizontalDivider()
+                        }
                     }
                 }
             }
