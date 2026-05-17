@@ -44,7 +44,11 @@ class BookListViewModel(
     fun deleteBook(id: Int) {
         viewModelScope.launch {
             deleteBookUseCase(id).fold(
-                onSuccess = { getBooks() },
+                onSuccess = {
+                    _state.value = _state.value.copy(
+                        books = _state.value.books.filter { it.id != id }
+                    )
+                },
                 onFailure = { error ->
                     _state.value = _state.value.copy(error = error.message)
                 }
